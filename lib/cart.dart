@@ -1,28 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:fruits/constants.dart';
+import 'animation_Text.dart';
 
-class Cart_Items extends StatefulWidget {
+class CartItems extends StatefulWidget {
   @override
-  _Cart_ItemsState createState() => _Cart_ItemsState();
+  _CartItemsState createState() => _CartItemsState();
 }
 
-class _Cart_ItemsState extends State<Cart_Items> {
+class _CartItemsState extends State<CartItems> with TickerProviderStateMixin {
+
+  Animation animation1;
+  AnimationController controller1;
+  Animation animation2;
+  AnimationController controller2;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    controller1 =
+        AnimationController(vsync: this, duration: Duration(seconds: 1));
+    controller2 =
+        AnimationController(vsync: this, duration: Duration(seconds: 6));
+    animation1 = Tween<double>(begin: 148, end: 300)
+        .animate(CurvedAnimation(parent: controller1, curve: Curves.easeIn))
+      ..addListener(() {
+        setState(() {});
+      });
+    animation2 = Tween<double>(begin: 130, end: 160)
+        .animate(CurvedAnimation(parent: controller2, curve: Curves.elasticOut))
+      ..addListener(() {
+        setState(() {});
+      });
+
+    controller1.forward();
+    controller2.forward();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    controller1.dispose();
+    controller2.dispose();
+    super.dispose();
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         leading: IconButton(
-
-          icon: Icon(Icons.arrow_back_ios,color: Colors.grey.shade500,),
-          onPressed: (){
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: Colors.grey.shade500,
+          ),
+          onPressed: () {
             Navigator.pop(context);
           },
-
         ),
         actions: <Widget>[
           Padding(
-            padding: const EdgeInsets.only(right:10.0),
+            padding: const EdgeInsets.only(right: 10.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
@@ -34,11 +75,9 @@ class _Cart_ItemsState extends State<Cart_Items> {
             ),
           )
         ],
-
         elevation: 0,
-
       ),
-      backgroundColor: light_cream_background,
+      backgroundColor: lightCreamBackground,
       body: Stack(
         alignment: Alignment.bottomRight,
         children: <Widget>[
@@ -46,23 +85,40 @@ class _Cart_ItemsState extends State<Cart_Items> {
             slivers: <Widget>[
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.only(left:20.0,top: 10),
-                  child: RichText(text: TextSpan(text: 'My',style: TextStyle(fontSize: 25,color: Colors.black87),children: [
-                    TextSpan(text: ' Order',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25,color: Colors.black87))
-                  ]),),
+                  padding: const EdgeInsets.only(left: 20.0, top: 10),
+                  child: Row(
+                    children: <Widget>[
+                      Text('My ',style: TextStyle(color: Colors.black, fontSize: 25)),
+                      AnimatedText(text: 'Order',fontSize: 25,)
+                    ],
+                  ),
+
+//                  child: RichText(
+//                    text: TextSpan(
+//                        text: 'My',
+//                        style: TextStyle(fontSize: 25, color: Colors.black87),
+//                        children: [
+//                          TextSpan(
+//                              text: ' Order',
+//                              style: TextStyle(
+//                                  fontWeight: FontWeight.bold,
+//                                  fontSize: 25,
+//                                  color: Colors.black87))
+//                        ]),
+//                  ),
                 ),
               ),
               SliverToBoxAdapter(
                 child: SizedBox(
                   height: 15,
-
                 ),
               ),
               SliverList(
-                delegate: SliverChildBuilderDelegate((BuildContext context,int index)
-                {
+                delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
                   return Padding(
-                    padding: const EdgeInsets.only(left:40.0,top: 10,bottom: 10,right: 40),
+                    padding: const EdgeInsets.only(
+                        left: 40.0, top: 10, bottom: 10, right: 40),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
@@ -74,19 +130,19 @@ class _Cart_ItemsState extends State<Cart_Items> {
                                 height: 150,
                                 width: 150,
                                 decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.all(Radius.circular(25)),
-                                    color: dark_cream_background
-                                ),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(25)),
+                                    color: darkCreamBackground),
                               ),
                               Padding(
-                                padding: const EdgeInsets.only(left:40.0,top:40),
+                                padding:
+                                    const EdgeInsets.only(left: 40.0, top: 40),
                                 child: Container(
-                                  height: 150,
-                                  width: 150,
+                                  height: animation2.value,
+                                  width: animation2.value,
                                   decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: Colors.white
-                                  ),
+                                      color: Colors.white),
                                   child: Image(
                                     image: AssetImage(images[index]),
                                   ),
@@ -98,22 +154,52 @@ class _Cart_ItemsState extends State<Cart_Items> {
                         Container(
                           child: Column(
                             children: <Widget>[
-                              RichText(text: TextSpan(text: "\u20B9 ",style: TextStyle(fontWeight: FontWeight.bold,color: Colors.black,fontSize: 30),children: [
-                                TextSpan(text: price[index],style: TextStyle(fontSize: 30,fontWeight:FontWeight.bold,color: Colors.black)),
-                                TextSpan(text: ".09",style: TextStyle(fontSize: 20,fontWeight:FontWeight.bold,color: Colors.black))
-                              ]),),
+                              RichText(
+                                text: TextSpan(
+                                    text: "\u20B9 ",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                        fontSize: 30),
+                                    children: [
+                                      TextSpan(
+                                          text: price[index],
+                                          style: TextStyle(
+                                              fontSize: 30,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black)),
+                                      TextSpan(
+                                          text: ".09",
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black))
+                                    ]),
+                              ),
                               SizedBox(
                                 height: 10,
                               ),
-                              Text(names[index],style: TextStyle(fontSize: 15,color: Colors.black87)),
-
+                              Text(names[index],
+                                  style: TextStyle(
+                                      fontSize: 15, color: Colors.black87)),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
-                                  IconButton(icon: Icon(Icons.add,size: 15,color: Colors.black54,),),
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.add,
+                                      size: 15,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
                                   Text("6"),
-                                  IconButton(icon: Icon(Icons.remove,size: 15,color: Colors.black54,),),
-
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.remove,
+                                      size: 15,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
                                 ],
                               )
                             ],
@@ -122,72 +208,82 @@ class _Cart_ItemsState extends State<Cart_Items> {
                       ],
                     ),
                   );
-                },
-                  childCount: 3
-                ),
+                }, childCount: 3),
               ),
               SliverToBoxAdapter(
                 child: SizedBox(
                   height: 25,
-
                 ),
               ),
               SliverList(
                 delegate: SliverChildListDelegate([
                   Padding(
-                    padding: const EdgeInsets.only(left:40.0, right: 40),
+                    padding: const EdgeInsets.only(left: 40.0, right: 40),
                     child: Column(
                       children: <Widget>[
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Text('Discount',style: TextStyle(color: Colors.grey.shade500),),
-                            Text('\u20B9 3',style: TextStyle(color: Colors.grey.shade500),),
-
+                            Text(
+                              'Discount',
+                              style: TextStyle(color: Colors.grey.shade500),
+                            ),
+                            Text(
+                              '\u20B9 3',
+                              style: TextStyle(color: Colors.grey.shade500),
+                            ),
                           ],
                         ),
-                        SizedBox(height: 15,),
+                        SizedBox(
+                          height: 15,
+                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Text('Total : ',style: TextStyle(color: Colors.black87,fontSize: 30,fontWeight: FontWeight.bold),),
-                            Text('\u20B9 13.00',style: TextStyle(color: Color(0xFF89A998),fontSize: 33,fontWeight: FontWeight.bold),),
-
+                            Text(
+                              'Total : ',
+                              style: TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              '\u20B9 13.00',
+                              style: TextStyle(
+                                  color: Color(0xFF89A998),
+                                  fontSize: 33,
+                                  fontWeight: FontWeight.bold),
+                            ),
                           ],
                         ),
                         SizedBox(
                           height: 100,
                         )
-
                       ],
                     ),
                   )
                 ]),
               )
-
             ],
-
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom:15.0),
+            padding: const EdgeInsets.only(bottom: 15.0),
             child: Container(
-
               height: 60,
-              width: MediaQuery.of(context).size.width-50,
+              width: animation1.value,
               decoration: BoxDecoration(
-                  color: confirm_order_button,
+                  color: confirmOrderButton,
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(27),
                       bottomLeft: Radius.circular(8))),
               child: FlatButton(
                 padding: EdgeInsets.all(0),
-                onPressed: (){
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => Cart_Items()));
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => CartItems()));
                 },
                 child: Row(
-                  mainAxisAlignment:
-                  MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
                     Text(
                       "Confirm Order",

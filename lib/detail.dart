@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fruits/animation_Text.dart';
 import 'constants.dart';
 import 'cart.dart';
 
@@ -10,47 +11,92 @@ class Details extends StatefulWidget {
   _DetailsState createState() => _DetailsState();
 }
 
-class _DetailsState extends State<Details> {
+class _DetailsState extends State<Details> with TickerProviderStateMixin {
+  Animation animation1;
+  AnimationController controller1;
+  Animation animation2;
+  AnimationController controller2;
+  Color iconColor = Colors.grey.shade700;
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    controller1 =
+        AnimationController(vsync: this, duration: Duration(seconds: 1));
+    controller2 =
+        AnimationController(vsync: this, duration: Duration(seconds: 6));
+    animation2 = Tween<double>(begin: 0, end: 60)
+        .animate(CurvedAnimation(parent: controller2, curve: Curves.elasticOut))
+          ..addListener(() {
+            setState(() {});
+          });
 
+    Future.delayed(Duration.zero, () {
+      animation1 = Tween<double>(
+              begin: 150, end: MediaQuery.of(context).size.width - 150)
+          .animate(CurvedAnimation(parent: controller1, curve: Curves.ease))
+            ..addListener(() {
+              setState(() {});
+            });
+    });
+
+    controller1.forward();
+    controller2.forward();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    controller1.dispose();
+    controller2.dispose();
+    iconColor = Colors.grey.shade700;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         children: <Widget>[
-
           Stack(
+            alignment: Alignment.bottomCenter,
             children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(0),
-                height: MediaQuery.of(context).size.height / 2 - 30,
-                width: MediaQuery.of(context).size.width,
-                color: dark_cream_background,
-                child: Hero(
-                  tag: hero[widget.index],
-                  child: Image(
-                    image: AssetImage(images[widget.index]),
+              Stack(
+                alignment: Alignment.topLeft,
+                children: <Widget>[
+                  Container(
+                    height: MediaQuery.of(context).size.height,
+                    width: MediaQuery.of(context).size.width,
+                    color: darkCreamBackground,
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Container(
+                        padding: EdgeInsets.all(0),
+                        height: MediaQuery.of(context).size.height / 2 - 30,
+                        width: MediaQuery.of(context).size.width,
+                        child: Hero(
+                          tag: hero[widget.index],
+                          child: Image(
+                            image: AssetImage(images[widget.index]),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.arrow_back_ios,
-                  color: Colors.black87,
-                ),
-                onPressed: (){
-                  Navigator.pop(context);
-                },
-              )
-            ],
-          ),
-          Stack(
-            children: <Widget>[
-
-              Container(
-                height: MediaQuery.of(context).size.height / 2,
-                color: dark_cream_background,
+                  Padding(
+                    padding: const EdgeInsets.only(top: 50.0),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.black87,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                ],
               ),
               Container(
                 height: MediaQuery.of(context).size.height / 2,
@@ -69,7 +115,14 @@ class _DetailsState extends State<Details> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          titles[widget.index],
+                          Row(
+                            children: <Widget>[
+                              Text(titles[widget.index],style: TextStyle(color: Colors.black, fontSize: 30)),
+                              AnimatedText(text: ' Fruit',fontSize: 30,)
+
+                            ],
+                          ),
+
                           SizedBox(
                             height: 20,
                           ),
@@ -106,11 +159,9 @@ class _DetailsState extends State<Details> {
                                               Icons.add,
                                               color: Colors.grey.shade700,
                                             ),
-                                            onPressed: (){
+                                            onPressed: () {
                                               setState(() {
-                                                quantity[widget.index]+=1;
-
-
+                                                quantity[widget.index] += 1;
                                               });
                                             },
                                           ),
@@ -136,12 +187,10 @@ class _DetailsState extends State<Details> {
                                             Icons.remove,
                                             color: Colors.grey.shade700,
                                           ),
-                                          onPressed: (){
+                                          onPressed: () {
                                             setState(() {
-                                              if(quantity[widget.index]>0)
-                                              quantity[widget.index]-=1;
-
-
+                                              if (quantity[widget.index] > 0)
+                                                quantity[widget.index] -= 1;
                                             });
                                           },
                                         ),
@@ -157,19 +206,19 @@ class _DetailsState extends State<Details> {
                                 text: TextSpan(
                                     text: "\u20B9",
                                     style: TextStyle(
-                                        color: confirm_order_button,
+                                        color: confirmOrderButton,
                                         fontSize: 25),
                                     children: [
                                       TextSpan(
                                           text: price[widget.index],
                                           style: TextStyle(
-                                              color: confirm_order_button,
+                                              color: confirmOrderButton,
                                               fontSize: 30,
                                               fontWeight: FontWeight.bold)),
                                       TextSpan(
                                           text: ".00",
                                           style: TextStyle(
-                                              color: confirm_order_button,
+                                              color: confirmOrderButton,
                                               fontSize: 25))
                                     ]),
                               )
@@ -192,7 +241,7 @@ class _DetailsState extends State<Details> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 20.0),
+                      padding: const EdgeInsets.only(left: 20.0, bottom: 15),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
@@ -202,48 +251,62 @@ class _DetailsState extends State<Details> {
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                      color: Colors.grey.shade500,
+                                      color: iconColor,
                                       blurRadius: 7)
                                 ]),
                             height: 50,
                             width: 50,
-                            child: Icon(
-                              Icons.favorite_border,
-                              color: Colors.grey.shade700,
+                            child: IconButton(
+                              onPressed: (){
+                                setState(() {
+
+                                  iconColor = Colors.red;
+                                });
+                              },
+                              icon: Icon(Icons.favorite_border,
+                                color: iconColor,)
                             ),
                           ),
-                          Container(
+                          Flexible(
+                            child: Container(
+                              padding: EdgeInsets.all(3),
 
-                            height: 60,
-                            width: MediaQuery.of(context).size.width-100,
-                            decoration: BoxDecoration(
-                                color: confirm_order_button,
-                                borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(27),
-                                    bottomLeft: Radius.circular(8))),
-                            child: FlatButton(
-                              padding: EdgeInsets.all(0),
-                              onPressed: (){
-                                Navigator.push(
-                                    context, MaterialPageRoute(builder: (context) => Cart_Items()));
-                              },
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: <Widget>[
-                                  Text(
-                                    "Add to Bucket",
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Icon(
-                                    Icons.arrow_forward,
-                                    color: Colors.white,
-                                    size: 20,
-                                  )
-                                ],
+                              height: 60,
+                              width: animation1.value,
+
+                              //width: MediaQuery.of(context).size.width-100,
+                              decoration: BoxDecoration(
+                                  color: confirmOrderButton,
+                                  borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(27),
+                                      bottomLeft: Radius.circular(8))),
+                              child: OutlineButton(
+                                padding: EdgeInsets.all(0),
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => CartItems()));
+                                },
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: <Widget>[
+                                    Text(
+                                      "Add to Bucket",
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Icon(
+
+                                      Icons.arrow_forward,color: Colors.white,
+                                        size: 20,
+
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
                           )
@@ -253,16 +316,34 @@ class _DetailsState extends State<Details> {
                   ],
                 ),
               ),
-
+              Positioned(
+                right: animation2.value,
+                child: Padding(
+                  //padding: EdgeInsets.only(bottom:animation2.value),
+                  padding: const EdgeInsets.only(bottom: 310.0),
+                  child: Container(
+                    padding: EdgeInsets.all(20),
+                    height: 70,
+                    width: MediaQuery.of(context).size.width - 100,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(30),
+                            bottomRight: Radius.circular(30),
+                            topRight: Radius.circular(9),
+                            bottomLeft: Radius.circular(9)),
+                        image: DecorationImage(
+                            image: AssetImage('asset/add_to_cart.png'),
+                            fit: BoxFit.fill)),
+                    child: Text(
+                      boxContent[widget.index],
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
-//          Center(
-//            child: Container(
-//              height: 40,
-//              width: MediaQuery.of(context).size.width / 2,
-//              color: green_color,
-//            ),
-//          ),
         ],
       ),
     );
